@@ -1,12 +1,12 @@
-package api.support;
+package api.request;
 
-public class Channel {
+public class SlackChannelPOJO {
 
 	private String name;
 	private boolean validate;
 	private String channel;
 
-	public Channel(String channelName) {
+	public SlackChannelPOJO(String channelName) {
 		this.name = channelName;
 		this.validate = true;
 	}

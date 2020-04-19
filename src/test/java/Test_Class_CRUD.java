@@ -1,76 +1,89 @@
 import api.controller.Executor;
-import api.support.Channel;
-import api.support.ChannelUtils;
+import api.request.SlackChannelPOJO;
+import api.support.FakerUtils;
 import com.github.javafaker.Faker;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import java.util.logging.Logger;
 
 public class Test_Class_CRUD {
     Executor executor = new Executor();
-    ChannelUtils channelUtils = new ChannelUtils();
+    FakerUtils fakerUtils = new FakerUtils();
     private JsonPath jsonPath;
-     Channel channel;
+     SlackChannelPOJO SlackChannelPOJO;
     private Faker faker;
     private String channelPayload;
     private Response response;
 
+    @BeforeTest
+    public void setUp() {
+        fakerUtils =  new FakerUtils();
+        SlackChannelPOJO = fakerUtils.createChannelPayload();
+        faker =  new Faker();
+    }
+
     @Test(priority = 3)
     public void getListOfChannels(){
         response = executor.get("https://slack.com/api/channels.list");
-        ResponseBody body = response.getBody();
-        System.out.println("Response body of list is " + body.asString());
+        System.out.println("Response body is " + response.getBody().asString());
         jsonPath = response.jsonPath();
-        Assert.assertEquals(response.statusCode(), 200);
+        Assert.assertEquals(jsonPath.getString("ok"),"true");
     }
 
     @Test(priority = 0)
     public void createChannel(){
-        String payload="{\"name\":\"checksarathtest23\"}";
-        //channelPayload = channelUtils.prepareChannelPayload(channel);
-        response = executor.post("https://slack.com/api/conversations.create",payload);
-        ResponseBody body = response.getBody();
-        System.out.println("Response body is " + body.asString());
+
+        channelPayload = fakerUtils.prepareChannelPayload(SlackChannelPOJO);
+        response = executor.post("https://slack.com/api/conversations.create",channelPayload);
+
+        System.out.println("Response body is " + response.getBody().asString());
         jsonPath = response.jsonPath();
-        Assert.assertEquals(response.statusCode(), 200);
+        SlackChannelPOJO.setChannel(jsonPath.getString("channel.id"));
+        Assert.assertEquals(jsonPath.getString("ok"),"true");
     }
 
     @Test(priority = 1)
-    public void checkCreatedChannelJoin(){
-        String payload="{\"name\":\"checksarathtest23\"}";
-        //channelPayload = channelUtils.prepareChannelPayload(channel);
-        response = executor.post("https://slack.com/api/conversations.join",payload);
-        ResponseBody body = response.getBody();
-        System.out.println("Response body of join channel is " + body.asString());
+    public void joiningChannel(){
+
+        channelPayload = fakerUtils.prepareChannelPayload(SlackChannelPOJO);
+        response = executor.post("https://slack.com/api/conversations.join",channelPayload);
+        System.out.println("Response body of join channel is " + response.getBody().asString());
         jsonPath = response.jsonPath();
-        Assert.assertEquals(response.statusCode(), 200);
+        Assert.assertEquals(jsonPath.getString("ok"), "true");
     }
 
     @Test(priority = 2)
     public void renameCreatedChannel(){
-        String payload="{\"channel\":\"checksarathtest23\",\"name\":\"checksarathtest33\"}";
-        response = executor.post("https://slack.com/api/conversations.rename",payload);
-        ResponseBody body = response.getBody();
-        System.out.println("Response body of join channel is " + body.asString());
+        SlackChannelPOJO.setName(faker.name().firstName().toLowerCase());
+        channelPayload = fakerUtils.prepareChannelPayload(SlackChannelPOJO);
+        response = executor.post("https://slack.com/api/conversations.rename",channelPayload);
+        System.out.println("Response body is " + response.getBody().asString());
         jsonPath = response.jsonPath();
-        Assert.assertEquals(response.statusCode(), 200);
+        Assert.assertEquals(jsonPath.getString("ok"), "true");
     }
 
     @Test(priority = 4)
     public void archiveCreatedChannel(){
-        String payload="{\"name\":\"checksarathtest33\"}";
-        response = executor.post("https://slack.com/api/conversations.archive",payload);
-        ResponseBody body = response.getBody();
-        System.out.println("Response body of join channel is " + body.asString());
+
+        channelPayload = fakerUtils.prepareChannelPayload(SlackChannelPOJO);
+        response = executor.post("https://slack.com/api/conversations.archive",channelPayload);
+        System.out.println("Response body is " + response.getBody().asString());
         jsonPath = response.jsonPath();
-        Assert.assertEquals(response.statusCode(), 200);
+        Assert.assertEquals(jsonPath.getString("ok"), "true");
+    }
+
+    @Test(priority = 5)
+    public void verifyArchivedChannel(){
+
+        channelPayload = fakerUtils.prepareChannelPayload(SlackChannelPOJO);
+        response = executor.post("https://slack.com/api/conversations.join",channelPayload);
+        System.out.println("Response body is " + response.getBody().asString());
+        jsonPath = response.jsonPath();
+        Assert.assertEquals(jsonPath.getString("error"),"is_archived");
+
     }
 
 }
