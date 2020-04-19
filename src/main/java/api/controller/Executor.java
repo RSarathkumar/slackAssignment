@@ -18,16 +18,13 @@ public class Executor {
 
     private RequestSpecification getAuthenticatedRequestHandle() {
          requestSpecification = RestAssured.given().auth()
-                 .oauth2("xoxb-1065164580470-1065172616630-zhgnsyfTzvDinwt5VzaNexyg")
+                 .oauth2(propertyUtils.getAuthToken())
                 .contentType(propertyUtils.getContentType());
-                //.baseUri(propertyUtils.getBaseUrl());
+
         return requestSpecification;
     }
 
-    public Response makeGetRequest(String endPoint) {
-        requestSpecification = getAuthenticatedRequestHandle();
-        return requestSpecification.get(endPoint);
-    }
+
 
 
     public Response get(String uRI) {
@@ -46,13 +43,6 @@ public class Executor {
         return response;
     }
 
-    public Response makePostRequest(String endPoint, String payLoad) {
-        requestSpecification = getAuthenticatedRequestHandle();
-
-        requestSpecification.body(payLoad);
-
-        return requestSpecification.post(endPoint);
-    }
 
     public Response post(String uRI, String bodyJSON) {
         return post(null, uRI, bodyJSON);
