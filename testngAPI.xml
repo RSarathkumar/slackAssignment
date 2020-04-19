@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="API Testing Suite">
+
+    <test name="Slack API Tests">
+
+        <classes>
+            <class name="Test_Class_CRUD"/>
+
+
+        </classes>
+    </test>
+
+</suite>
