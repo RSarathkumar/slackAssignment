@@ -1,5 +1,5 @@
 # API Automation of CRUD activities in SLACK
-This is an CRUD operations performed using API Slack methods.
+ CRUD operations performed using API Slack methods -  `channels in slack`.
 ## The automation tech stack:
 `Language : Java`
 
