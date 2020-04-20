@@ -1,5 +1,5 @@
 # API Automation of CRUD activities in SLACK
-This is an assignment work done for an interview for a company.
+This is an CRUD operations performed using API Slack methods.
 ## The automation tech stack:
 `Language : Java`
 
